@@ -3,19 +3,9 @@
  */
 package ca.seinesoftware.hamcrest.path;
 
-import static ca.seinesoftware.hamcrest.path.PathMatcher.aDirectory;
-import static ca.seinesoftware.hamcrest.path.PathMatcher.aRegularFile;
-import static ca.seinesoftware.hamcrest.path.PathMatcher.executable;
-import static ca.seinesoftware.hamcrest.path.PathMatcher.exists;
-import static ca.seinesoftware.hamcrest.path.PathMatcher.readable;
-import static ca.seinesoftware.hamcrest.path.PathMatcher.sameFile;
-import static ca.seinesoftware.hamcrest.path.PathMatcher.symbolicLink;
-import static ca.seinesoftware.hamcrest.path.PathMatcher.writable;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.startsWith;
+import static ca.seinesoftware.hamcrest.path.PathMatcher.*;
+import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 
@@ -42,15 +32,34 @@ public class PathMatcherTest {
 	@ClassRule
 	public static TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-	private static Path testFolder, testFile, noFile;
+	private static Path testFolder, testFile, noFile, linkFile, linkNoFile, hiddenFile;
 
 	@BeforeClass
 	public static void beforeClass() throws IOException {
 		testFolder = temporaryFolder.newFolder("folder").toPath();
+
 		testFile = testFolder.resolve("test-file");
+		Files.write(testFile, Collections.singleton("Some text"), StandardCharsets.ISO_8859_1);
+		testFile.toFile().setWritable(false);
+
 		noFile = testFolder.resolve("no-file");
 
-		Files.write(testFile, Collections.singleton("Some text"), StandardCharsets.ISO_8859_1);
+		try {
+			linkFile = Files.createSymbolicLink(testFolder.resolve("link-file"), testFile);
+		} catch (IOException e) {
+		}
+
+		try {
+			linkNoFile = Files.createSymbolicLink(testFolder.resolve("link-no-file"), noFile);
+		} catch (IOException e) {
+		}
+
+		hiddenFile = testFolder.resolve(".hidden");
+		Files.write(hiddenFile, Collections.singleton("Hidden"), StandardCharsets.ISO_8859_1);
+		try {
+			Files.setAttribute(hiddenFile, "dos:hidden", Boolean.TRUE);
+		} catch (UnsupportedOperationException | IOException e) {
+		}
 	}
 
 	// ========================================================================
@@ -65,6 +74,22 @@ public class PathMatcherTest {
 	@Test
 	public void testFileExists() {
 		assertThat(testFile, exists());
+	}
+
+	@Test
+	public void linkFileExists() {
+		assumeThat(linkFile, notNullValue());
+
+		assertThat(linkFile, exists(NOFOLLOW_LINKS));
+		assertThat(linkFile, exists());
+	}
+
+	@Test
+	public void linkNoFileDoesNotExists() {
+		assumeThat(linkNoFile, notNullValue());
+
+		assertThat(linkNoFile, exists(NOFOLLOW_LINKS));
+		assertThat(linkNoFile, not(exists()));
 	}
 
 	@Test
@@ -100,15 +125,16 @@ public class PathMatcherTest {
 
 	@Test
 	public void isNotADirectoryDescription() {
-		String description = mismatchDescriptionFor(noFile, aDirectory());
-		assertThat(description, both(containsString("a directory")).and(containsString(" does not exist")));
+		String description = mismatchDescriptionFor(noFile, aDirectory(NOFOLLOW_LINKS));
+		assertThat(description,
+				both(containsString("a non-symbolic link to a directory")).and(containsString(" does not exist")));
 	}
 
 	@Test
 	public void isFileNotADirectoryDescription() {
-		String description = mismatchDescriptionFor(testFile, aDirectory());
+		String description = mismatchDescriptionFor(hiddenFile, aDirectory());
 		assertThat(description, both(containsString("a directory")).and(containsString(" is a readable, writable, "))
-				.and(containsString("regular file")));
+				.and(containsString("hidden regular file")));
 	}
 
 	// ========================================================================
@@ -132,8 +158,9 @@ public class PathMatcherTest {
 
 	@Test
 	public void isNotARegularFileDescription() {
-		String description = mismatchDescriptionFor(noFile, aRegularFile());
-		assertThat(description, both(containsString("a regular file")).and(containsString(" does not exist")));
+		String description = mismatchDescriptionFor(noFile, aRegularFile(NOFOLLOW_LINKS));
+		assertThat(description,
+				both(containsString("a non-symbolic link to a regular file")).and(containsString(" does not exist")));
 	}
 
 	@Test
@@ -141,6 +168,37 @@ public class PathMatcherTest {
 		String description = mismatchDescriptionFor(testFolder, aRegularFile());
 		assertThat(description, both(containsString("a regular file"))
 				.and(containsString(" is a readable, writable, executable directory")));
+	}
+
+	// ========================================================================
+	// Symbolic Link
+	// ========================================================================
+
+	@Test
+	public void tempFolderIsNotSymbolicLink() {
+		assertThat(testFolder, is(not(symbolicLink())));
+	}
+
+	@Test
+	public void testFileIsNotSymbolicLink() {
+		assertThat(testFile, is(not(symbolicLink())));
+	}
+
+	@Test
+	public void linkFileIsSymbolicLink() {
+		assumeThat(linkFile, notNullValue());
+		assertThat(linkFile, is(symbolicLink()));
+	}
+
+	@Test
+	public void noFileIsNotSymbolicLink() {
+		assertThat(noFile, is(not(symbolicLink())));
+	}
+
+	@Test
+	public void isNotSymbolicLinkDescription() {
+		String description = mismatchDescriptionFor(noFile, symbolicLink());
+		assertThat(description, both(containsString("a symbolic link")).and(containsString(" does not exist")));
 	}
 
 	// ========================================================================
@@ -179,8 +237,8 @@ public class PathMatcherTest {
 	}
 
 	@Test
-	public void testFileIsWritable() {
-		assertThat(testFile, is(writable()));
+	public void testFileIsNotWritable() {
+		assertThat(testFile, is(not(writable())));
 	}
 
 	@Test
@@ -225,28 +283,34 @@ public class PathMatcherTest {
 	}
 
 	// ========================================================================
-	// Symbolic Link
+	// Hidden File/Directory
 	// ========================================================================
 
 	@Test
-	public void tempFolderIsNotSymbolicLink() {
-		assertThat(testFolder, is(not(symbolicLink())));
+	public void testFolderIsNotHidden() {
+		assertThat(testFolder, is(not(hidden())));
 	}
 
 	@Test
-	public void testFileIsNotSymbolicLink() {
-		assertThat(testFile, is(not(symbolicLink())));
+	public void testFileIsNotHidden() {
+		assertThat(testFile, is(not(hidden())));
 	}
 
 	@Test
-	public void noFileIsNotSymbolicLink() {
-		assertThat(noFile, is(not(symbolicLink())));
+	public void hiddenFileIsHidden() {
+		assertThat(hiddenFile, is(hidden()));
 	}
 
 	@Test
-	public void isNotSymbolicLinkDescription() {
-		String description = mismatchDescriptionFor(noFile, symbolicLink());
-		assertThat(description, both(containsString("a symbolic link")).and(containsString(" does not exist")));
+	public void noFileIsNotHidden() {
+		assertThat(noFile, is(not(hidden())));
+	}
+
+	@Test
+	public void isNotHiddenDescription() {
+		String description = mismatchDescriptionFor(noFile, hidden());
+		assertThat(description,
+				both(containsString("a hidden file or directory")).and(containsString(" does not exist")));
 	}
 
 	// ========================================================================
@@ -257,6 +321,17 @@ public class PathMatcherTest {
 	public void isSameAsTestFile() {
 		Path relative = Paths.get("..", "folder", "test-file");
 		assertThat(testFolder.resolve(relative), is(sameFile(testFile)));
+	}
+
+	@Test
+	public void isNotSameFileAsNoFile() {
+		assertThat(noFile, is(not(sameFile(testFile))));
+	}
+
+	@Test
+	public void isNotSameFileDescription() {
+		String description = mismatchDescriptionFor(noFile, sameFile(testFile));
+		assertThat(description, both(containsString("\\test-file> but was <")).and(containsString("\\no-file>")));
 	}
 
 	// ========================================================================

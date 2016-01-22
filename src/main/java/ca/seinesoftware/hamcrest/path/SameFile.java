@@ -11,7 +11,7 @@ class SameFile extends TypeSafeMatcher<Path> {
 
 	private final Path expected;
 
-	public SameFile(Path expected) {
+	public SameFile(final Path expected) {
 		this.expected = expected;
 	}
 
@@ -21,7 +21,7 @@ class SameFile extends TypeSafeMatcher<Path> {
 	}
 
 	@Override
-	protected boolean matchesSafely(Path actual) {
+	protected boolean matchesSafely(final Path actual) {
 		try {
 			return Files.isSameFile(actual, expected);
 		} catch (IOException e) {

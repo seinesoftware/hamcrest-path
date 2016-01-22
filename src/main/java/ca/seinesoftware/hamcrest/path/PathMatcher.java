@@ -22,9 +22,15 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	// Constructor
 	// ========================================================================
 
+	private final static LinkOption[] NO_OPTIONS = {};
+
 	protected final LinkOption[] linkOptions;
 
-	protected PathMatcher(LinkOption... options) {
+	protected PathMatcher() {
+		linkOptions = NO_OPTIONS;
+	}
+
+	protected PathMatcher(final LinkOption... options) {
 		linkOptions = options;
 	}
 
@@ -34,11 +40,11 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 
 	@Override
 	public void describeTo(Description description) {
-		for (LinkOption option : linkOptions) {
-			switch (option) {
-			case NOFOLLOW_LINKS:
+		for (final LinkOption option : linkOptions) {
+			if (option == LinkOption.NOFOLLOW_LINKS) {
 				description.appendText("a non-symbolic link to ");
-				break;
+			} else {
+				throw new IllegalArgumentException("Unknown option: " + option);
 			}
 		}
 	}
@@ -48,7 +54,7 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	// ========================================================================
 
 	@Override
-	protected void describeMismatchSafely(Path path, Description description) {
+	protected void describeMismatchSafely(final Path path, Description description) {
 		if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
 			description.appendValue(path).appendText(" is a ");
 			if (Files.isSymbolicLink(path)) {
@@ -116,7 +122,7 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 *         not exist or its existence cannot be determined.
 	 */
 	@Factory
-	public static Matcher<Path> exists(LinkOption... options) {
+	public static Matcher<Path> exists(final LinkOption... options) {
 		return new Exists(options);
 	}
 
@@ -142,7 +148,7 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 *         determined if the path is a directory or not.
 	 */
 	@Factory
-	public static Matcher<Path> aDirectory(LinkOption... options) {
+	public static Matcher<Path> aDirectory(final LinkOption... options) {
 		return new Directory(options);
 	}
 
@@ -168,7 +174,7 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 *         determined if the path is a regular file or not.
 	 */
 	@Factory
-	public static Matcher<Path> aRegularFile(LinkOption... options) {
+	public static Matcher<Path> aRegularFile(final LinkOption... options) {
 		return new RegularFile(options);
 	}
 
@@ -296,7 +302,7 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 * @return {@code true} if, and only if, the two paths locate the same file
 	 */
 	@Factory
-	public static Matcher<Path> sameFile(Path expected) {
+	public static Matcher<Path> sameFile(final Path expected) {
 		return new SameFile(expected);
 	}
 
