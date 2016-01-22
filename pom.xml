@@ -21,7 +21,7 @@
 	</licenses>
 
 	<scm>
-		<url>git@github.com/seinesoftware/hamcrest-path.git</url>
+		<url>https://github.com/seinesoftware/hamcrest-path</url>
 		<connection>scm:git:git@github.com:seinesoftware/hamcrest-path.git</connection>
 		<developerConnection>scm:git:git@github.com:seinesoftware/hamcrest-path.git</developerConnection>
 	</scm>
@@ -35,6 +35,9 @@
 		<developer>
 			<id>aneufeld</id>
 			<name>Arthur Neufeld</name>
+			<email>aneufeld@seinesoftware.ca</email>
+			<organization>Seine Software, Inc</organization>
+			<organizationUrl>http://seinesoftware.ca/</organizationUrl>
 			<roles>
 				<role>Developer</role>
 			</roles>
@@ -69,7 +72,7 @@
 
 	<build>
 		<plugins>
-		
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
@@ -81,8 +84,18 @@
 				<artifactId>coveralls-maven-plugin</artifactId>
 				<version>4.1.0</version>
 			</plugin>
-			
+
 		</plugins>
 	</build>
 
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/seinesoftware/hamcrest-path/issues</url>
+	</issueManagement>
+	
+	<ciManagement>
+		<url>https://travis-ci.org/seinesoftware/hamcrest-path</url>
+		<system>Travis CI</system>
+	</ciManagement>
+	
 </project>
