@@ -331,7 +331,7 @@ public class PathMatcherTest {
 	@Test
 	public void isNotSameFileDescription() {
 		String description = mismatchDescriptionFor(noFile, sameFile(testFile));
-		assertThat(description, both(containsString("\\test-file> but was <")).and(containsString("\\no-file>")));
+		assertThat(description, both(containsString("test-file> but was <")).and(containsString("no-file>")));
 	}
 
 	// ========================================================================
