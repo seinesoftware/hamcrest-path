@@ -41,6 +41,7 @@ is readable, and is writable:
         public void testHomeDirectory() {
             Path home = Paths.get(System.getProperty("user.home"));
             assertThat(home, exists());
+            assertThat(home, is(aDirectory());
             assertThat(home, is(readable()));
             assertThat(home, is(writable()));
         }
