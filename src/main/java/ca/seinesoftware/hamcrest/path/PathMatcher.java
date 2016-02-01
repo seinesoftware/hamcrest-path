@@ -13,6 +13,39 @@ import org.hamcrest.TypeSafeMatcher;
 
 /**
  * PathMatcher
+ * <p>
+ * A static factory for creating {@link org.hamcrest.Matcher} instances for
+ * testing whether {@link Path} objects correspond to file system objects, and
+ * whether those objects are readable, writable, and/or executable.
+ * <p>
+ * For example:
+ *
+ * <pre>
+ * import static ca.seinesoftware.hamcrest.path.PathMatcher.*;
+ * import static org.hamcrest.Matchers.is;
+ * import static org.junit.Assert.assertThat;
+ *
+ * import java.nio.file.Path;
+ * import java.nio.file.Paths;
+ *
+ * import org.junit.Test;
+ *
+ * public class HomeTest {
+ *     &#64;Test
+ *     public void testHomeDirectory() {
+ *         Path home = Paths.get(System.getProperty("user.home"));
+ *         assertThat(home, exists());
+ *         assertThat(home, is(readable());
+ *         assertThat(home, is(writable());
+ *     }
+ * }
+ * </pre>
+ *
+ * <p>
+ * <b>Note</b> that the result of any test is <em>immediately outdated</em>. If
+ * a test indicates the existence or accessibility of a file system object,
+ * there is no guarantee that a subsequence access will succeed. Care should be
+ * taken when using these methods in security sensitive applications.
  *
  * @author Arthur Neufeld &lt;aneufeld@seinesoftware.ca&gt;
  */
@@ -24,14 +57,19 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 
 	private final static LinkOption[] NO_OPTIONS = {};
 
+	/**
+	 * Options to indicate how symbolic links are handled. By default, symbolic
+	 * links are followed. If the option {@link LinkOption#NOFOLLOW_LINKS
+	 * NOFOLLOW_LINKS} is present then symbolic links are not followed.
+	 */
 	protected final LinkOption[] linkOptions;
-
-	protected PathMatcher() {
-		linkOptions = NO_OPTIONS;
-	}
 
 	protected PathMatcher(final LinkOption... options) {
 		linkOptions = options;
+	}
+
+	protected PathMatcher() {
+		this(NO_OPTIONS);
 	}
 
 	// ========================================================================
@@ -103,7 +141,7 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 
 	/**
 	 * Create a matcher that matches if the examined {@link Path} can be
-	 * determined to exist.
+	 * determined to <em>exist</em>.
 	 * <p>
 	 * By default, symbolic links are followed. If the option
 	 * {@link LinkOption#NOFOLLOW_LINKS NOFOLLOW_LINKS} is present then symbolic
@@ -117,7 +155,7 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 * </pre>
 	 *
 	 * @param options
-	 *            - options indicating how symbolic links are handled
+	 *            options indicating how symbolic links are handled
 	 * @return {@code true} if the file exists; {@code false} if the file does
 	 *         not exist or its existence cannot be determined.
 	 */
@@ -128,7 +166,7 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 
 	/**
 	 * Create a matcher that matches if the examined {@link Path} is a
-	 * directory.
+	 * <em>directory</em>.
 	 * <p>
 	 * By default, symbolic links are followed. If the option
 	 * {@link LinkOption#NOFOLLOW_LINKS NOFOLLOW_LINKS} is present then symbolic
@@ -142,7 +180,7 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 * </pre>
 	 *
 	 * @param options
-	 *            - options indicating how symbolic links are handled
+	 *            options indicating how symbolic links are handled
 	 * @return {@code true} if the path is a directory; {@code false} if the
 	 *         path does not exist, is not a directory, or it cannot be
 	 *         determined if the path is a directory or not.
@@ -153,8 +191,8 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	}
 
 	/**
-	 * Create a matcher that matches if the examined {@link Path} is a regular
-	 * file.
+	 * Create a matcher that matches if the examined {@link Path} is a
+	 * <em>regular file</em>.
 	 * <p>
 	 * By default, symbolic links are followed. If the option
 	 * {@link LinkOption#NOFOLLOW_LINKS NOFOLLOW_LINKS} is present then symbolic
@@ -168,7 +206,7 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 * </pre>
 	 *
 	 * @param options
-	 *            - options indicating how symbolic links are handled
+	 *            options indicating how symbolic links are handled
 	 * @return {@code true} if the path is a regular file; {@code false} if the
 	 *         path does not exist, is not a regular file, or it cannot be
 	 *         determined if the path is a regular file or not.
@@ -179,14 +217,14 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	}
 
 	/**
-	 * Create a matcher that matches if the examined {@link Path} is a symbolic
-	 * link.
+	 * Create a matcher that matches if the examined {@link Path} is a
+	 * <em>symbolic link</em>.
 	 *
 	 * <p>
 	 * For example:
 	 *
 	 * <pre>
-	 * assertThat(Paths.get("/tmp"), is(executable()));
+	 * assertThat(Paths.get("/tmp"), is(not(symbolicLink())));
 	 * </pre>
 	 *
 	 * @return {@code true} if the path is a symbolic link; {@code false} if the
@@ -199,7 +237,8 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	}
 
 	/**
-	 * Create a matcher that matches if the examined {@link Path} is a readable.
+	 * Create a matcher that matches if the examined {@link Path} is a
+	 * <em>readable</em>.
 	 *
 	 * <p>
 	 * For example:
@@ -219,7 +258,8 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	}
 
 	/**
-	 * Create a matcher that matches if the examined {@link Path} is a writable.
+	 * Create a matcher that matches if the examined {@link Path} is a
+	 * <em>writable</em>.
 	 *
 	 * <p>
 	 * For example:
@@ -240,10 +280,10 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 
 	/**
 	 * Create a matcher that matches if the examined {@link Path} is a
-	 * executable. The semantics may differ when checking access to a directory.
-	 * For example, on UNIX systems, checking for execute access checks that the
-	 * Java virtual machine has permission to search the directory in order to
-	 * access file or subdirectories.
+	 * <em>executable</em>. The semantics may differ when checking access to a
+	 * directory. For example, on UNIX systems, checking for execute access
+	 * checks that the Java virtual machine has permission to search the
+	 * directory in order to access file or subdirectories.
 	 *
 	 * <p>
 	 * For example:
@@ -288,9 +328,10 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 
 	/**
 	 * Create a matcher that matches if the examined {@link Path} describes the
-	 * same file system object as another {@link Path}, even if relative paths
-	 * descend into and out of sub-directories, or symbolic links are used to
-	 * arrive at the file via another path.
+	 * <em>same file system object</em> as a given {@link Path}. Two distinct
+	 * paths can describe the same file system object if relative paths are used
+	 * to descend into and/or out of sub-directories, or symbolic links are used
+	 * to jump through the file system.
 	 *
 	 * <p>
 	 * For example:
@@ -299,6 +340,8 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 * assertThat(Paths.get("/tmp/../tmp"), is(sameFile(Paths.get("/tmp"))));
 	 * </pre>
 	 *
+	 * @param expected
+	 *            path to the expected file system object.
 	 * @return {@code true} if, and only if, the two paths locate the same file
 	 */
 	@Factory

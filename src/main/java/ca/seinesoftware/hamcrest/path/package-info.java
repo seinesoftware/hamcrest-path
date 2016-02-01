@@ -8,8 +8,8 @@
  * <p>
  * Note that the result of any test is immediately outdated. If a test indicates
  * the existence or accessibility of a file system object, there is no guarantee
- * that a subsequence access will succeed. Care should be taken when using this
- * method in security sensitive applications.
+ * that a subsequence access will succeed. Care should be taken when using these
+ * methods in security sensitive applications.
  *
  * @since 1.0
  * @author Arthur Neufeld &lt;aneufeld@seinesoftware.ca&gt;
