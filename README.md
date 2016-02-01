@@ -8,10 +8,26 @@ What is Hamcrest-Path?
 Hamcrest-Path is a [hamcrest][] extension library,
 which provides a suite of hamcrest-style matchers for file/directory existence and permissions.
 
+Without the hamcrest-path library, testing whether a file is readable would need to be written as:
+
+        Path path = Paths.get("/path/to/some/file");
+        assertThat(Files.isReadable(path), is(true));
+
+If the test failed, a non-informative error message would be generated stating
+an accurate but cryptic message: "Expected: is <`true`>, but: was <`false`>".
+With the hamcrest-path library, the test can be re-written as:
+
+        Path path = Paths.get("/path/to/some/file");
+        assertThat(path, is(readable()));
+
+Not only is this more concise, but if the assertion fails, a more informative error message is generated:
+"Expected: is a readable file or directory, but: </path/to/some/file> does not exist." 
+
+
 
 Downloads
 ---------
-You can obtain the hamcrest-path binaries from [maven central][], or download them automatically in maven using:
+You can obtain the hamcrest-path binaries from [maven central][], or download them automatically in Maven using:
 
 	<dependencies>
 	    <dependency>
@@ -25,10 +41,10 @@ You can obtain the hamcrest-path binaries from [maven central][], or download th
 Usage
 -----
 The following code tests whether the user's home directory exists,
-is readable, and is writable:
+and is both readable and writable:
 
     import static ca.seinesoftware.hamcrest.path.PathMatcher.*;
-    import static org.hamcrest.Matchers.is;
+    import static org.hamcrest.Matchers.*;
     import static org.junit.Assert.assertThat;
 
     import java.nio.file.Path;
@@ -42,8 +58,7 @@ is readable, and is writable:
             Path home = Paths.get(System.getProperty("user.home"));
             assertThat(home, exists());
             assertThat(home, is(aDirectory());
-            assertThat(home, is(readable()));
-            assertThat(home, is(writable()));
+            assertThat(home, is(both(readable()).and(writable())));
         }
     }
 
