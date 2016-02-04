@@ -30,13 +30,13 @@ import org.hamcrest.TypeSafeMatcher;
  * import org.junit.Test;
  *
  * public class HomeTest {
- * 	   &#64;Test
- * 	   public void testHomeDirectory() {
- * 	       Path home = Paths.get(System.getProperty("user.home"));
- * 	       assertThat(home, exists());
- * 	       assertThat(home, is(aDirectory()));
- * 	       assertThat(home, is(both(readable()).and(writable())));
- * 	   }
+ * 	  &#64;Test
+ * 	  public void testHomeDirectory() {
+ * 	      Path home = Paths.get(System.getProperty("user.home"));
+ * 	      assertThat(home, exists());
+ * 	      assertThat(home, is(aDirectory()));
+ * 	      assertThat(home, is(both(readable()).and(writable())));
+ * 	  }
  * }
  * </pre>
  *
@@ -227,6 +227,30 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 *         path does not exist, is not a symbolic link, or it cannot be
 	 *         determined if the path is a symbolic link or not.
 	 */
+	public static Matcher<Path> aSymbolicLink() {
+		return new SymbolicLink();
+	}
+
+	/**
+	 * Create a matcher that matches if the examined {@link Path} is a
+	 * <em>symbolic link</em>.
+	 *
+	 * <p>
+	 * For example:
+	 *
+	 * <pre>
+	 * assertThat(Paths.get("/tmp"), is(not(symbolicLink())));
+	 * </pre>
+	 *
+	 * @return {@code true} if the path is a symbolic link; {@code false} if the
+	 *         path does not exist, is not a symbolic link, or it cannot be
+	 *         determined if the path is a symbolic link or not.
+	 * @deprecated To be consistent with {@link #aRegularFile(LinkOption...)}
+	 *             and {@link #aDirectory(LinkOption...)}, this was renamed to
+	 *             {@link #aSymbolicLink()}
+	 *
+	 */
+	@Deprecated
 	public static Matcher<Path> symbolicLink() {
 		return new SymbolicLink();
 	}

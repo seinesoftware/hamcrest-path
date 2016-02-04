@@ -71,7 +71,7 @@ and is both readable and writable:
 
 Other matchers include:
 * __aRegularFile__ - Tests whether the file system entry is a regular file
-* __symbolicLink__ - Tests whether the file system entry is a symbolic link
+* __aSymbolicLink__ - Tests whether the file system entry is a symbolic link
 * __sameFile__ - Tests if two paths reference the same file system entry
 * __executable__ - Test whether the user has execute permissions for the file system entry
 * __hidden__ - Test whether the file system entry is hidden
