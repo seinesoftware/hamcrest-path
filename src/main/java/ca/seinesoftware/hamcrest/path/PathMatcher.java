@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.attribute.DosFileAttributes;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
@@ -31,13 +30,13 @@ import org.hamcrest.TypeSafeMatcher;
  * import org.junit.Test;
  *
  * public class HomeTest {
- *     &#64;Test
- *     public void testHomeDirectory() {
- *         Path home = Paths.get(System.getProperty("user.home"));
- *         assertThat(home, exists());
- *         assertThat(home, is(readable());
- *         assertThat(home, is(writable());
- *     }
+ * 	   &#64;Test
+ * 	   public void testHomeDirectory() {
+ * 	       Path home = Paths.get(System.getProperty("user.home"));
+ * 	       assertThat(home, exists());
+ * 	       assertThat(home, is(aDirectory()));
+ * 	       assertThat(home, is(both(readable()).and(writable())));
+ * 	   }
  * }
  * </pre>
  *
@@ -159,7 +158,6 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 * @return {@code true} if the file exists; {@code false} if the file does
 	 *         not exist or its existence cannot be determined.
 	 */
-	@Factory
 	public static Matcher<Path> exists(final LinkOption... options) {
 		return new Exists(options);
 	}
@@ -185,7 +183,6 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 *         path does not exist, is not a directory, or it cannot be
 	 *         determined if the path is a directory or not.
 	 */
-	@Factory
 	public static Matcher<Path> aDirectory(final LinkOption... options) {
 		return new Directory(options);
 	}
@@ -211,7 +208,6 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 *         path does not exist, is not a regular file, or it cannot be
 	 *         determined if the path is a regular file or not.
 	 */
-	@Factory
 	public static Matcher<Path> aRegularFile(final LinkOption... options) {
 		return new RegularFile(options);
 	}
@@ -231,7 +227,6 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 *         path does not exist, is not a symbolic link, or it cannot be
 	 *         determined if the path is a symbolic link or not.
 	 */
-	@Factory
 	public static Matcher<Path> symbolicLink() {
 		return new SymbolicLink();
 	}
@@ -252,7 +247,6 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 *         Java virtual machine has insufficient privileges, or access
 	 *         cannot be determined
 	 */
-	@Factory
 	public static Matcher<Path> readable() {
 		return new Readable();
 	}
@@ -273,7 +267,6 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 *         Java virtual machine has insufficient privileges, or access
 	 *         cannot be determined
 	 */
-	@Factory
 	public static Matcher<Path> writable() {
 		return new Writable();
 	}
@@ -297,7 +290,6 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 *         because the Java virtual machine has insufficient privileges, or
 	 *         access cannot be determined
 	 */
-	@Factory
 	public static Matcher<Path> executable() {
 		return new Executable();
 	}
@@ -321,7 +313,6 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 *         the path does not exist, the file is not hidden, or access cannot
 	 *         be determined
 	 */
-	@Factory
 	public static Matcher<Path> hidden() {
 		return new Hidden();
 	}
@@ -344,7 +335,6 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 *            path to the expected file system object.
 	 * @return {@code true} if, and only if, the two paths locate the same file
 	 */
-	@Factory
 	public static Matcher<Path> sameFile(final Path expected) {
 		return new SameFile(expected);
 	}
