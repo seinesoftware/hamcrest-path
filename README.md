@@ -37,7 +37,7 @@ A Maven project:
     <dependency>
 	    <groupId>ca.seinesoftware</groupId>
 	    <artifactId>hamcrest-path</artifactId>
-	    <version>1.0.0</version>
+	    <version>1.0.1</version>
 	    <scope>test</scope>
 	</dependency>
 
