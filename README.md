@@ -43,7 +43,7 @@ A Maven project:
 
 A project which uses ivy for dependency management:
 
-    <dependency org="ca.seinesoftware" name="hamcrest-path" rev="1.0.0"/>
+    <dependency org="ca.seinesoftware" name="hamcrest-path" rev="1.0.1"/>
 
 Usage
 -----
