@@ -1,10 +1,7 @@
 package ca.seinesoftware.hamcrest.path;
 
-import static ca.seinesoftware.hamcrest.path.PathMatcher.aDirectory;
-import static ca.seinesoftware.hamcrest.path.PathMatcher.exists;
-import static ca.seinesoftware.hamcrest.path.PathMatcher.readable;
-import static ca.seinesoftware.hamcrest.path.PathMatcher.writable;
-import static org.hamcrest.Matchers.is;
+import static ca.seinesoftware.hamcrest.path.PathMatcher.*;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 import java.nio.file.Path;
@@ -18,7 +15,6 @@ public class HomeTest {
 		Path home = Paths.get(System.getProperty("user.home"));
 		assertThat(home, exists());
 		assertThat(home, is(aDirectory()));
-		assertThat(home, is(readable()));
-		assertThat(home, is(writable()));
+		assertThat(home, is(both(readable()).and(writable())));
 	}
 }

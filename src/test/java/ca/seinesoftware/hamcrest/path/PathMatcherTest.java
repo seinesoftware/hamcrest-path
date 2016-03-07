@@ -3,9 +3,22 @@
  */
 package ca.seinesoftware.hamcrest.path;
 
-import static ca.seinesoftware.hamcrest.path.PathMatcher.*;
+import static ca.seinesoftware.hamcrest.path.PathMatcher.aDirectory;
+import static ca.seinesoftware.hamcrest.path.PathMatcher.aRegularFile;
+import static ca.seinesoftware.hamcrest.path.PathMatcher.aSymbolicLink;
+import static ca.seinesoftware.hamcrest.path.PathMatcher.executable;
+import static ca.seinesoftware.hamcrest.path.PathMatcher.exists;
+import static ca.seinesoftware.hamcrest.path.PathMatcher.hidden;
+import static ca.seinesoftware.hamcrest.path.PathMatcher.readable;
+import static ca.seinesoftware.hamcrest.path.PathMatcher.sameFile;
+import static ca.seinesoftware.hamcrest.path.PathMatcher.writable;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 
@@ -176,28 +189,28 @@ public class PathMatcherTest {
 
 	@Test
 	public void tempFolderIsNotSymbolicLink() {
-		assertThat(testFolder, is(not(symbolicLink())));
+		assertThat(testFolder, is(not(aSymbolicLink())));
 	}
 
 	@Test
 	public void testFileIsNotSymbolicLink() {
-		assertThat(testFile, is(not(symbolicLink())));
+		assertThat(testFile, is(not(aSymbolicLink())));
 	}
 
 	@Test
 	public void linkFileIsSymbolicLink() {
 		assumeThat(linkFile, notNullValue());
-		assertThat(linkFile, is(symbolicLink()));
+		assertThat(linkFile, is(aSymbolicLink()));
 	}
 
 	@Test
 	public void noFileIsNotSymbolicLink() {
-		assertThat(noFile, is(not(symbolicLink())));
+		assertThat(noFile, is(not(aSymbolicLink())));
 	}
 
 	@Test
 	public void isNotSymbolicLinkDescription() {
-		String description = mismatchDescriptionFor(noFile, symbolicLink());
+		String description = mismatchDescriptionFor(noFile, aSymbolicLink());
 		assertThat(description, both(containsString("a symbolic link")).and(containsString(" does not exist")));
 	}
 
