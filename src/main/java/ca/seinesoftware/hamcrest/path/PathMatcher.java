@@ -220,7 +220,7 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 * For example:
 	 *
 	 * <pre>
-	 * assertThat(Paths.get("/tmp"), is(not(symbolicLink())));
+	 * assertThat(Paths.get("/tmp"), is(not(aSymbolicLink())));
 	 * </pre>
 	 *
 	 * @return {@code true} if the path is a symbolic link; {@code false} if the
@@ -300,7 +300,7 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	 * <em>executable</em>. The semantics may differ when checking access to a
 	 * directory. For example, on UNIX systems, checking for execute access
 	 * checks that the Java virtual machine has permission to search the
-	 * directory in order to access file or subdirectories.
+	 * directory in order to access files or subdirectories.
 	 *
 	 * <p>
 	 * For example:
@@ -321,9 +321,9 @@ public abstract class PathMatcher extends TypeSafeMatcher<Path> {
 	/**
 	 * Create a matcher that matches if the examined {@link Path} is a
 	 * <em>hidden</em>. The exact definition of hidden is platform or provider
-	 * dependent. On UNIX for example a file is considered to be hidden if its
-	 * name begins with a period character ('.'). On Windows a file is
-	 * considered hidden if it isn't a directory and the DOS
+	 * dependent. For example, on UNIX a file is considered to be hidden if
+	 * its name begins with a period character ('.'), where as on Windows a
+	 * file is considered hidden if it isn't a directory and the DOS
 	 * {@link DosFileAttributes#isHidden hidden} attribute is set.
 	 *
 	 * <p>
